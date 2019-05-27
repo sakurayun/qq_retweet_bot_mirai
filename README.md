@@ -1,9 +1,10 @@
 # qq_retweet_bot
 使用 Python 编写和 CoolQ 第三方 QQ 应用程序的 QQ 转推机器人脚本
 
-##使用方法
+## 使用方法
 ---
-###在Linux上使用
+### 在Linux上使用
+
 0.0 安装Wine
 0.1 安装Docker
 
