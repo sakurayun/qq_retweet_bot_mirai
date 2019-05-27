@@ -8,6 +8,7 @@
 0.1 安装Docker
 
 1. 安装Tweepy
-<p>pip install tweepy</p>
+<pre><code>pip install tweepy</pre></code>
 2. 安装<a href="https://cqp.cc/">酷Q</a>
+
 3. 安装<a href="https://cqhttp.cc/">CQHTTP</a>
