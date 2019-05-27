@@ -8,3 +8,7 @@
 2. 安装<a href="https://cqp.cc/">酷Q</a>
 
 3. 安装<a href="https://cqhttp.cc/">CQHTTP</a>
+4. 设置系统Crontab服务每隔一段时间运行一次
+
+## 其他
+脚本会创建一个 Last_id 缓存文件，请勿删除
