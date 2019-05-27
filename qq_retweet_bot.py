@@ -32,7 +32,7 @@ def analysis_time(retweet_time):
 
 def send_qqgroup_message(retweet_time,tweet_data,actual_name,qq_group_id):
 	message_format = '＃' + actual_name +'＃' + retweet_time +'\n\n'
-	tweet_data = message_format + tweet_data + '\n\n———\n\n' + tweet_data
+	tweet_data = message_format + tweet_data
 	tweet_data=quote(tweet_data)
 	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ tweet_data)
 
