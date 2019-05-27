@@ -4,8 +4,9 @@
 ## 使用方法
 ### 在Linux上使用
 
-0.0 安装Wine
-0.1 安装Docker
+0.0. 安装Wine
+
+0.1. 安装Docker
 
 1. 安装Tweepy
 <pre><code>pip install tweepy</pre></code>
