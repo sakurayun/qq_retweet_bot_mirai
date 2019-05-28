@@ -2,11 +2,11 @@
 使用 Python 编写和 CoolQ 第三方 QQ 应用程序的 QQ 转推机器人脚本
 
 ## 安装
-请准备好VPS和Twitter开发者账号的keys and tokens以用于设置
+请准备好VPS和Twitter开发者账号的keys and Tokens以用于设置
 0. 安装<a href="https://www.winehq.org/">Wine</a>、<a href="https://www.docker.com/">Docker</a>
 1. 安装Tweepy
 <pre><code>pip install tweepy</pre></code>
-2. 安装<a href="https://cqp.cc/">酷Q</a>（只有酷Q Pro版本才有搬图功能，如不需要可自行删除相关代码）
+2. 安装<a href="https://cqp.cc/">酷Q</a>（只有酷Q Pro版本才有搬图功能）
 
 3. 安装<a href="https://cqhttp.cc/">CQHTTP</a>，并将上报端口地址设置为5700，或在代码中自行更改
 4. 设置系统Crontab服务每隔一段时间运行一次
@@ -15,6 +15,9 @@
 <pre><code>*/time  *  *  * [user] /[path-to-file]</pre></code>
 
 ## 使用
+
+填入Twitter Keys and Tokens、更改retweet函数的参数以设置转推的用户、是否带图、是否识别标签
+<pre><code>retweet('推特screen_name','用户在现实中的名字',QQ群号,['仅搬运该标签内容']或0（不识别）,0（不带图）/1（带图，酷Q Air版用户填1会报错）)</pre></code>
 
 ### 推文类型
 推文分为一般推文、带媒体推文、转推、评论和转发并评论。他们在转推机中的格式是：
