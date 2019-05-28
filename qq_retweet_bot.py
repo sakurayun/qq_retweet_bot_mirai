@@ -49,7 +49,7 @@ def recog_tag(tags_data,match_tag):
 				tags = 1
 	return tags
 
-def retweet(screen_name,actual_name,qq_group_id,match_tag):
+def retweet(screen_name,actual_name,qq_group_id,match_tag,with_picture):
 	txtname = retweet_group + '_' + screen_name + '_tweet_ids.txt'
 	tweets=[]
 	last_id = 0
@@ -61,7 +61,7 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 	else:
 		fileread=open(txtname,"r")
 		for i in fileread.readlines():
-			print(i)
+			print('Last Tweet id:'+ i)
 			if i is not '':
 				last_id = int(i)
 			fileread.close()
@@ -90,8 +90,9 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 				mu=[m['media_url'] for m in media]
 				for n in mu:
 					if media != '':
-						send_picture(qq_group_id,n)
-						print('Tweet id: '+n)
+						if with_picture == 1:
+							send_picture(qq_group_id,n)
+							print('Pictire URL: '+n)
 
 		filewrite=open(txtname,"w+")
 		filewrite.writelines(str(last_id))
@@ -126,8 +127,9 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 				print('推文发送成功')
 				for n in tweet['tweet_media']:
 					if media != '':
-						send_picture(qq_group_id,n)
-						print('图片发送成功')
+						if with_picture == 1:
+							send_picture(qq_group_id,n)
+							print('图片发送成功')
 
 			if tweet['tweet_id'] > last_id:
 				last_id = tweet['tweet_id']
@@ -136,7 +138,7 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 		fileread.writelines(str(last_id))
 		fileread.close()
 
-retweet('screen_name','测试',00000000,['test'])
-retweet('screen_name','测试',00000000,0)
+#retweet('screen_name','测试',00000000,['test'],0,1)
+#retweet('screen_name','twitter_user's_real_name',qq_group_id,['tag'] or 0(no tag recognization),0(without_picture) or 1(with picture))
 exit(0)
 
