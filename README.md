@@ -9,8 +9,8 @@
 
 3. 安装<a href="https://cqhttp.cc/">CQHTTP</a>，并将上报端口地址设置为5700，或在代码中自行更改
 4. 设置系统Crontab服务每隔一段时间运行一次
-<pre><code>vi /etc/crontab
-*/time  *  *  * <user> /<path-to-file></pre></code>
+<pre><code>vi /etc/crontab</pre></code>
+<pre><code>*/time  *  *  * [user] /[path-to-file]</pre></code>
 
 ## 使用
 
