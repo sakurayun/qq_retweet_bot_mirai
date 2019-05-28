@@ -54,6 +54,7 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 	tweets=[]
 	last_id = 0
 	tags=0
+	
 	if not os.path.exists(txtname):
 		fileread=open(txtname,"a+")
 		fileread.close()
@@ -64,6 +65,7 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 			if i is not '':
 				last_id = int(i)
 			fileread.close()
+
 	if last_id==0:
 		new_tweets=api.user_timeline(screen_name=screen_name,count = 1,tweet_mode='extended',include_rts='false',include_entities=True)
 		for tweet in new_tweets:
@@ -71,14 +73,17 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 				media = tweet.extended_entities.get('media',[])
 			except:
 				media =''
+
 			retweet_text = tweet.full_text
 			last_id = tweet.id
 			retweet_time = analysis_time(tweet.created_at)
+
 			try:
 				tags_data = tweet.entities.get('hashtags',[])
 				tags = recog_tag(tags_data,match_tag)
 			except:
 				tags = 1
+
 			if tags == 0 or match_tag ==0:
 				send_qqgroup_message(retweet_time,retweet_text,actual_name,qq_group_id)
 				print('推文发送成功')
@@ -98,20 +103,24 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 				media = status.extended_entities.get('media',[])
 			except:
 				media = ''
+
 			try:
 				tags_data = status.entities.get('hashtags',[])
 				tags = recog_tag(tags_data,match_tag)
 			except:
 				tags = 1
+
 			tweets.append({
 			    'text': status.full_text,
 				'tweet_id':status.id,
 				'tweet_time':status.created_at,
 				'tweet_media':[m['media_url'] for m in media]
 				})
+
 		for tweet in reversed(tweets):
 			retweet_text=tweet['text']
 			retweet_time = analysis_time(tweet['tweet_time'])
+
 			if tags == 0 or match_tag == 0:
 				send_qqgroup_message(retweet_time,retweet_text,actual_name,qq_group_id)
 				print('推文发送成功')
@@ -119,8 +128,10 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag):
 					if media != '':
 						send_picture(qq_group_id,n)
 						print('图片发送成功')
+
 			if tweet['tweet_id'] > last_id:
 				last_id = tweet['tweet_id']
+
 		fileread=open(txtname,"w+")
 		fileread.writelines(str(last_id))
 		fileread.close()
