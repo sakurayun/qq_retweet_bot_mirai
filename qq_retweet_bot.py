@@ -134,7 +134,7 @@ def send_tweet(new_tweets,actual_name,qq_group_id,tags,reply_user_name,last_id,m
             print('推文发送成功')
             mu=[m['media_url'] for m in media]
             for n in mu:
-                if media != '' and with_picture == 0:
+                if media != '' and with_picture == 1:
                     send_picture(qq_group_id,n)
                     print('图片发送成功，Image URL: '+n)
     return last_id
