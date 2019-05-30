@@ -12,27 +12,37 @@ import datetime
 from datetime import datetime
 from datetime import timedelta
 
-consumer_key = 'your_consumer_key'
-consumer_secret = 'your_consumer_secret'
-access_token = 'your_access_token'
-access_token_secret = 'your_access_token_secret'
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_token_secret = ''
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)  
 auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-retweet_group = '组名'
+retweet_group = 'RAS'
 
 def analysis_time(retweet_time):
-	offset_hours = 8                         
+	offset_hours = 8                            
 	local_timestamp = retweet_time + timedelta(hours=offset_hours)
 	final_timestamp = datetime.strftime(local_timestamp,'%m.%d %H:%M:%S')
 	return final_timestamp
 
-def send_qqgroup_message(retweet_time,tweet_data,actual_name,qq_group_id):
-	message_format = '＃' + actual_name +'＃' + retweet_time +'\n\n'
-	tweet_data = message_format + tweet_data
+def send_qqgroup_message(retweet_time,tweet_data,actual_name,qq_group_id,reply_user_name,reply_text,rt_tweet_text,rt_user,repeat):
+	message_format = '#'+actual_name+'# '+retweet_time+'\n\n'
+	original_tweet_data=tweet_data
+	if repeat == '0':
+		original_tweet_data=tweet_data + '\n----\n' + tweet_data
+	elif repeat =='1':
+		original_tweet_data = tweet_data
+	if reply_user_name != 'NULL':
+		tweet_data=message_format + original_tweet_data +'\n\n回复 #'+reply_user_name+'#\n\n'+reply_text
+	elif rt_user !='':
+		tweet_data=message_format + original_tweet_data +'\n\n转发 #'+rt_user+'#\n\n'+rt_tweet_text
+	else:
+		tweet_data=message_format + original_tweet_data
 	tweet_data=quote(tweet_data)
 	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ tweet_data)
 
@@ -49,96 +59,102 @@ def recog_tag(tags_data,match_tag):
 				tags = 1
 	return tags
 
-def retweet(screen_name,actual_name,qq_group_id,match_tag,with_picture):
-	txtname = retweet_group + '_' + screen_name + '_tweet_ids.txt'
-	tweets=[]
-	last_id = 0
-	tags=0
-	
-	if not os.path.exists(txtname):
-		fileread=open(txtname,"a+")
-		fileread.close()
-	else:
-		fileread=open(txtname,"r")
-		for i in fileread.readlines():
-			print('Last Tweet id:'+ i)
-			if i is not '':
-				last_id = int(i)
-			fileread.close()
+def analysis_screen_name(screen_name):
+	user=api.get_user(screen_name)
+	name=user.name
+	return name
 
+def readfile(txtname):
+    last_id = 0
+    if not os.path.exists(txtname):
+        fileread=open(txtname,"a+")
+        fileread.close()
+    else:
+        fileread=open(txtname,"r")
+        for i in fileread.readlines():
+            print(i)
+            if i is not '':
+                last_id = int(i)
+            fileread.close()
+    return last_id
+
+def writefile(txtname,last_id):
+	filewrite=open(txtname,"w+")
+	filewrite.writelines(str(last_id))
+	filewrite.close()
+
+def get_in_reply_tweet(in_reply_id):
+    status=api.get_status(in_reply_id,tweet_mode='extended')
+    return status.full_text
+
+def send_tweet(new_tweets,actual_name,qq_group_id,tags,reply_user_name,last_id,match_tag,repeat,with_picture):
+    tags=0
+    for status in reversed(new_tweets):
+        try:
+            media = status.extended_entities.get('media',[])
+        except:
+            media = ''
+        try:
+            tags_data = status.entities.get('hashtags',[])
+            tags = recog_tag(tags_data,match_tag)
+        except:
+            tags = 1
+        try:
+            reply_user_screen_name = status.in_reply_to_screen_name
+            reply_user_name = analysis_screen_name(reply_user_screen_name)
+        except:
+            reply_user_name = 'NULL'
+        try:
+            tags_data = status.entities.get('hashtags',[])
+            tags = recog_tag(tags_data,match_tag)
+        except:
+            tags = 1
+        try:
+            in_reply_id = status.in_reply_to_status_id
+            reply_text = get_in_reply_tweet(in_reply_id)
+        except:
+            reply_text = ''
+        
+        try:
+            rt_tweet_text = status.quoted_status.full_text
+            rt_user = status.quoted_status.user.name
+
+        except:
+            rt_tweet_text = ''
+            rt_user = ''
+
+        retweet_text = status.full_text
+        retweet_time = analysis_time(status.created_at)
+        if last_id == 0:
+            last_id = status.id
+        elif status.id > last_id:
+            last_id = status.id
+        if tags == 0 or match_tag == 0:
+            send_qqgroup_message(retweet_time,retweet_text,actual_name,qq_group_id,reply_user_name,reply_text,rt_tweet_text,rt_user,repeat)
+            print('推文发送成功')
+            mu=[m['media_url'] for m in media]
+            for n in mu:
+                if media != '' and with_picture == 0:
+                    send_picture(qq_group_id,n)
+                    print('图片发送成功，Image URL: '+n)
+    return last_id
+
+def retweet(screen_name,actual_name,qq_group_id,match_tag,repeat,with_picture):
+	txtname = retweet_group + '_' + screen_name + '_tweet_ids.txt'
+	tags=0
+	reply_user_name='NULL'
+	last_id=readfile(txtname)
 	if last_id==0:
 		new_tweets=api.user_timeline(screen_name=screen_name,count = 1,tweet_mode='extended',include_rts='false',include_entities=True)
-		for tweet in new_tweets:
-			try:
-				media = tweet.extended_entities.get('media',[])
-			except:
-				media =''
-
-			retweet_text = tweet.full_text
-			last_id = tweet.id
-			retweet_time = analysis_time(tweet.created_at)
-
-			try:
-				tags_data = tweet.entities.get('hashtags',[])
-				tags = recog_tag(tags_data,match_tag)
-			except:
-				tags = 1
-
-			if tags == 0 or match_tag ==0:
-				send_qqgroup_message(retweet_time,retweet_text,actual_name,qq_group_id)
-				print('推文发送成功')
-				mu=[m['media_url'] for m in media]
-				for n in mu:
-					if media != '':
-						if with_picture == 1:
-							send_picture(qq_group_id,n)
-							print('Pictire URL: '+n)
-
-		filewrite=open(txtname,"w+")
-		filewrite.writelines(str(last_id))
-		filewrite.close()
+		last_id=send_tweet(new_tweets,actual_name,qq_group_id,tags,reply_user_name,last_id,match_tag,repeat,with_picture)
+		writefile(txtname,last_id)
 	else:
-		new_tweets=tweepy.Cursor(api.user_timeline,screen_name=screen_name,since_id = last_id,include_rts='false',tweet_mode='extended',include_entities=True).items()
-		for status in new_tweets:
-			try:
-				media = status.extended_entities.get('media',[])
-			except:
-				media = ''
+		new_tweets=api.user_timeline(screen_name=screen_name,since_id = last_id,include_rts='false',tweet_mode='extended',include_entities=True)
+		last_id=send_tweet(new_tweets,actual_name,qq_group_id,tags,reply_user_name,last_id,match_tag,repeat,with_picture)
+		writefile(txtname,last_id)
 
-			try:
-				tags_data = status.entities.get('hashtags',[])
-				tags = recog_tag(tags_data,match_tag)
-			except:
-				tags = 1
-
-			tweets.append({
-			    'text': status.full_text,
-				'tweet_id':status.id,
-				'tweet_time':status.created_at,
-				'tweet_media':[m['media_url'] for m in media]
-				})
-
-		for tweet in reversed(tweets):
-			retweet_text=tweet['text']
-			retweet_time = analysis_time(tweet['tweet_time'])
-
-			if tags == 0 or match_tag == 0:
-				send_qqgroup_message(retweet_time,retweet_text,actual_name,qq_group_id)
-				print('推文发送成功')
-				for n in tweet['tweet_media']:
-					if media != '':
-						if with_picture == 1:
-							send_picture(qq_group_id,n)
-							print('图片发送成功')
-
-			if tweet['tweet_id'] > last_id:
-				last_id = tweet['tweet_id']
-
-		fileread=open(txtname,"w+")
-		fileread.writelines(str(last_id))
-		fileread.close()
 
 #retweet('screen_name','测试',00000000,['test'],0,1)
-#retweet('screen_name','twitter_user's_real_name',qq_group_id,['tag'] or 0(no tag recognization),0(without_picture) or 1(with picture))
+#retweet('screen_name','twitter_user's_real_name',qq_group_id,['tag'] or 0(no tag recognization),0(repeat) or 1(not_repeat),0(with_picture) or 1(without_picture))
 exit(0)
 
