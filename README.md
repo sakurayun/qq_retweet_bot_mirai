@@ -3,6 +3,7 @@
 
 ## 安装
 请准备好VPS和Twitter开发者账号的keys and Tokens以用于设置
+
 0. 安装<a href="https://www.winehq.org/">Wine</a>、<a href="https://www.docker.com/">Docker</a>
 1. 安装Tweepy
 <pre><code>pip install tweepy</pre></code>
