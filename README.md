@@ -1,5 +1,5 @@
 # qq_retweet_bot
-使用 Python 编写和 CoolQ 第三方 QQ 应用程序的 QQ 转推机器人脚本
+使用 Python 编写和 CoolQ 的 QQ 转推机器人脚本
 
 ## 安装
 请准备好VPS和Twitter开发者账号的keys and Tokens以用于设置
