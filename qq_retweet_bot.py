@@ -1,4 +1,5 @@
 #coding:utf-8
+import requests
 import tweepy
 import json as js
 import os
@@ -24,6 +25,53 @@ api = tweepy.API(auth)
 
 retweet_group = 'RAS'
 
+def get_session(qq='',addr='http://127.0.0.1:11451'):
+    global qq,addr
+    #Setup tunnel
+    response = requests.get(addr+'/about')
+    print('Version Info:\n'+str(response.text)+'\n\n')
+    body = '{"authKey":"input_ur_authKey_here"}'
+    response2 = requests.post(url=addr+'/auth',data=body)
+    print('Status Code: '+str(response2.status_code)+'\n\n')
+
+    #Gather session
+    r2t=response2.text
+    if r2t[8] == '0':
+        session = r2t[21:-2]
+        global session
+        print('Session Code: '+str(session))
+    else:
+        print(r2t[8])
+
+    #Verify session
+    body_session = '{"sessionKey":"'+session+'","qq":"'+qq+'"}'
+    global body_session
+    response3 = requests.post(url=addr+'/verify',data=body_session)
+    print('\n\n')
+    r3t=response3.text
+    if r3t[8] == '0':
+        print('Successfully Initialized Retweet API!')
+    else:
+        print('Failed!')
+    return session
+
+def release_session():
+    response = requests.post(url=addr+'/release',data=body_session)
+    rt=response.text
+    if rt[8] == '0':
+        print('Successfully Released Session ID!')
+    else:
+        print('Failed!')
+    return
+
+
+def send_group_mirai(qq_group_id,datatobesent):
+    body_tobesent = '{"sessionKey":"'+ session + '","target": ' + qq_group_id + ''',"messageChain":[{"type": "Plain", "text":"''' + datatobesent + '"}]}'
+    response4 = requests.post(url=addr+'/sendGroupMessage',data=body_tobesent)
+    r4t=response4.text
+    print(r4t)
+
+
 def analysis_time(retweet_time):
 	offset_hours = 8                            
 	local_timestamp = retweet_time + timedelta(hours=offset_hours)
@@ -44,12 +92,18 @@ def send_qqgroup_message(retweet_time,tweet_data,actual_name,qq_group_id,reply_u
 	else:
 		tweet_data=message_format + original_tweet_data
 	tweet_data=quote(tweet_data)
-	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ tweet_data)
+#	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ tweet_data)
+    send_group_mirai(tweet_data)
 
 def send_picture(qq_group_id,url):
-	url=quote("[CQ:image,file="+url+"]")
-	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ url)
-
+#	url=quote("[CQ:image,file="+url+"]")
+#	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ url)
+    image_tobesent = '{"sessionKey":"'+ session + '","group": ' + qq_group_id + ''',"urls":["''' + url + '"]}'
+    response5 = requests.post(url=addr+'/sendImageMessage',data=image_tobesent)
+    r5t=response5.text
+    print(r5t)
+    return
+    
 def recog_tag(tags_data,match_tag):
 	for single_tag in tags_data:
 		for single_match_tag in match_tag:
@@ -154,7 +208,13 @@ def retweet(screen_name,actual_name,qq_group_id,match_tag,repeat,with_picture):
 		writefile(txtname,last_id)
 
 
+
+
+#get_session()
+
 #retweet('screen_name','测试',00000000,['test'],0,1)
 #retweet('screen_name','twitter_user's_real_name',qq_group_id,['tag'] or 0(no tag recognization),0(repeat) or 1(not_repeat),0(with_picture) or 1(without_picture))
+
+#release_session()
 exit(0)
 
