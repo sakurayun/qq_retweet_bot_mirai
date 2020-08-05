@@ -1,7 +1,10 @@
+# qq_retweet_bot_mirai
+##关于此fork
+由于CoolQ停止服务，此fork将项目修改以适配Mirai-api-Http。如需访问CoolQ版本，请[返回原Repo](https://github.com/xiofan2/qq_retweet_bot "xiofan2/qq_retweet_bot")
+
+---
 # qq_retweet_bot
 使用 Python 编写和 CoolQ 的 QQ 转推机器人脚本
-
-注：此fork将项目修改适配Mirai-api-Http
 
 ## 安装
 请准备好VPS和Twitter开发者账号的keys and Tokens以用于设置
