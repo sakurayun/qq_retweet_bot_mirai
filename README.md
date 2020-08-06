@@ -12,8 +12,11 @@
 
 ## 感谢
 [xiofan2/qq_retweet_bot](https://github.com/xiofan2/qq_retweet_bot)
+
 [project-mirai/mirai-api-http](https://github.com/project-mirai/mirai-api-http)
+
 [mamoe/mirai](https://github.com/mamoe/mirai/tree/master)
+
 特别感谢andropig(立方爹)debug
 ---
 # qq_retweet_bot
