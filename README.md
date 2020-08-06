@@ -1,6 +1,14 @@
 # qq_retweet_bot_mirai
-##关于此fork
+## 关于此fork
 由于CoolQ停止服务，此fork将项目修改以适配Mirai-api-Http。如需访问CoolQ版本，请[返回原Repo](https://github.com/xiofan2/qq_retweet_bot "xiofan2/qq_retweet_bot")
+
+## 配置
+1. 安装python3
+2. 安装tweepy
+3. 下载MiraiOK
+4. 下载、安装并按官方教程配置Mirai-Api-HTTP
+5. clone本项目，填写自己的apikey、服务器地址、token等信息。在末尾填写转推列表
+6. 测试，在Windows环境下可以使用计划任务来定时运行
 
 ---
 # qq_retweet_bot
