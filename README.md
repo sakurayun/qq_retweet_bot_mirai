@@ -10,6 +10,11 @@
 5. clone本项目，填写自己的apikey、服务器地址、token等信息。在末尾填写转推列表
 6. 测试，在Windows环境下可以使用计划任务来定时运行
 
+## 感谢
+[xiofan2/qq_retweet_bot](https://github.com/xiofan2/qq_retweet_bot)
+[project-mirai/mirai-api-http](https://github.com/project-mirai/mirai-api-http)
+[mamoe/mirai](https://github.com/mamoe/mirai/tree/master)
+特别感谢andropig(立方爹)debug
 ---
 # qq_retweet_bot
 使用 Python 编写和 CoolQ 的 QQ 转推机器人脚本
