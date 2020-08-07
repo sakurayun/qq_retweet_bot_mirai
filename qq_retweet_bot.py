@@ -276,7 +276,15 @@ def translate(orig_text):
             translate_result = result["trans_result"][0]["dst"]
             print('\nTranslate result: ' + '\n' + translate_result)
         except:
-            translate_result = ''
+            try:
+                shit = '''!@#$%^&*(_+=-\][\';/\.,?><:"{}|`~（）【】；‘。、『』「」〔〕》《：“”~·￥'''
+                for i in shit:
+                    translate_result = result["trans_result"][0]["dst"]
+                    translate_result = translate_result.replace(i,'☕')
+                    print('\nTranslate result: ' + '\n' + translate_result)
+            except:
+                translate_result = ''
+                
     else:
         print('[Console] [translate] Translation Failed!')
 
@@ -313,16 +321,26 @@ retweet('qwertyoruiopz','qwertyoruiop',567435967,0,0,1)
 retweet('tim_cook','Tim Cook',567435967,0,0,1)
 retweet('PanguTeam','PanguTeam',567435967,0,0,1)
 #Key社family
-retweet('iktd13_', 'Na-Ga', 884169045, 0, 0, 1)
-retweet('takeshitaaaa', '竹下智博', 884169045, 0, 0, 1)
-retweet('kay_comment', '魁', 884169045, 0, 0, 1)
-retweet('maeda_jun_lab', '麻枝准研究所', 884169045, 0, 0, 1)
-retweet('kamisama_Ch_AB', '神様になった日&Charlotte&AB!公式', 884169045, 0, 0, 1)
-retweet('jun_owakon', '麻枝 准', 884169045, 0, 0, 1)
-retweet('key_official', 'Key開発室', 884169045, 0, 0, 1)
-retweet('kiyo_mizutsuki', '水月陵', 884169045, 0, 0, 1)
+retweet('iktd13_', 'Na-Ga', 198582349, 0, 0, 1)
+retweet('takeshitaaaa', '竹下智博', 198582349, 0, 0, 1)
+retweet('kay_comment', '魁', 198582349, 0, 0, 1)
+retweet('maeda_jun_lab', '麻枝准研究所', 198582349, 0, 0, 1)
+retweet('kamisama_Ch_AB', '神様になった日&Charlotte&AB!公式', 198582349, 0, 0, 1)
+retweet('jun_owakon', '麻枝 准', 198582349, 0, 0, 1)
+retweet('key_official', 'Key開発室', 198582349, 0, 0, 1)
+retweet('kiyo_mizutsuki', '水月陵', 198582349, 0, 0, 1)
+#聖翔音樂学院陕西分部
+retweet('aibaaiai', '相羽あいな', 653076756, ['スタァライト'], 0, 1)
+retweet('ayasa_ito', '伊藤 彩沙', 653076756, ['スタァライト'], 0, 1)
+retweet('chichichi430', '生田 輝', 653076756, ['スタァライト'], 0, 1)
+retweet('haruki_iwata', '岩田 陽葵', 653076756, ['スタァライト'], 0, 1)
+retweet('k_moeka_', '小泉萌香', 653076756, ['スタァライト'], 0, 1)
+retweet('koyamamomoyo', '小山 百代', 653076756, ['スタァライト'], 0, 1)
+retweet('maho_tomita6261', '富田麻帆', 653076756, ['スタァライト'], 0, 1)
+retweet('mimori_suzuko', '三森すずこ', 653076756, ['スタァライト'], 0, 1)
+retweet('satohina1223', '佐藤日向', 653076756, ['スタァライト'], 0, 1)
+
 
 print('\n\n'+'Stage3:Cleanup'.center(50,'-')+'\n')
 release_session()
-
 exit(0)
