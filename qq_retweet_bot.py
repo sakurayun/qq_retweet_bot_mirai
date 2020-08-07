@@ -15,6 +15,8 @@ import urllib.request
 import json as js
 import requests
 import urllib
+import random
+import hashlib
 import time
 import datetime
 from datetime import datetime
@@ -26,28 +28,30 @@ consumer_key = ''
 consumer_secret = ''
 access_token = '-'
 access_token_secret = ''
+baidu_app_id = ''
+baidu_id_key = ''
 retweet_group = 'Inari'
-addr = 'http://localhost:11451'
+addr = 'http://127.0.0.1:11451'
 #Process keys
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-def get_session(qq='550463623'):
+def get_session(qq=''):
     global body_session, session
     # Setup tunnel
     response = requests.get(addr + '/about')
     rt1=str(response.text)
     ver = rt1[-9:-3]
-    print('Mirai-Api-HTTP Version: ' + ver + '\n')
-    body = '{"authKey":"1145141919810"}'
+    print('[Console] Mirai-Api-HTTP Version: ' + ver)
+    body = '{"authKey":""}'
     response2 = requests.post(url=addr + '/auth', data=body)
-    print('HTTP Status Code: ' + str(response2.status_code) + '\n')
+    print('[Console] HTTP Status Code: ' + str(response2.status_code))
     # Gather session
     r2t = response2.text
     if r2t[8] == '0':
         session = r2t[21:-2]
-        print('Session Code: ' + str(session) + '\n')
+        print('[Console] Session Code: ' + str(session))
     else:
         print(r2t[8])
     # Verify session
@@ -55,9 +59,9 @@ def get_session(qq='550463623'):
     response3 = requests.post(url=addr + '/verify', data=body_session)
     r3t = response3.text
     if r3t[8] == '0':
-        print('Successfully connected to Mirai-Api-HTTP server!\n')
+        print('[Console] [get_session] Successfully connected to Mirai-Api-HTTP server!\n')
     else:
-        print('Failed!')
+        print('[Console] [get_session] Failed!')
         print(r3t)
     return session
 
@@ -67,9 +71,9 @@ def release_session():
     response = requests.post(url=addr + '/release', data=body_session)
     rt = response.text
     if rt[8] == '0':
-        print('\nSuccessfully Released Session ID!')
+        print('[Console] [release_session] Successfully Released Session ID!')
     else:
-        print('Failed!')
+        print('[Console] [release_session] Failed!')
     return 0
 
 
@@ -78,7 +82,7 @@ def send_group_mirai(datatobesent, qq_group_id):
         qq_group_id) + ''',"messageChain":[{"type": "Plain", "text":"''' + datatobesent + '"}]}'
     response4 = requests.post(url=addr + '/sendGroupMessage', data=body_tobesent.encode('utf-8'))
     r4t = response4.text
-    print(r4t)
+    print(r4t.replace('{"code":','[Console] [send_group_mirai] Code: ').replace(',"msg":'," | Message: ").replace(',"messageId":',' | Message ID: ').replace('}',''))
     return 0
 
 
@@ -92,22 +96,31 @@ def analysis_time(retweet_time):
 def send_qqgroup_message(retweet_time, tweet_data, actual_name, qq_group_id, reply_user_name, reply_text, rt_tweet_text,
                          rt_user, repeat):
     # str(retweet_time,actual_name)
-    message_format = '🌹' + actual_name + '🌹 于' + retweet_time + '更新了推文\n\n'
+    message_format = '🌸' + actual_name + '🌸 于' + retweet_time + '更新了推文🍀\n\n'
     original_tweet_data = tweet_data
     if repeat == '0':
         original_tweet_data = tweet_data + '\n----\n' + tweet_data
     elif repeat == '1':
         original_tweet_data = tweet_data
     if reply_user_name != 'NULL':
-        tweet_data = message_format + original_tweet_data + '\n\n回复 #' + reply_user_name + '#\n\n' + reply_text
+        tweet_data = message_format + original_tweet_data + '\n\n回复 🌴' + reply_user_name + '🌴\n\n' + reply_text
+        translate_tweet_data = translate(original_tweet_data.replace('\n','🍄').replace('「','🍺').replace('」','🍉'))
+        translate_reply = translate(reply_text.replace('\n','🍄').replace('「','🍺').replace('」','🍉'))
+        translate_data = '由 🍧百度翻译🍧 提供的翻译：\n\n' + translate_tweet_data + '\n\n回复 🌴' + reply_user_name + '🌴\n\n' + translate_reply
     elif rt_user != '':
-        tweet_data = message_format + original_tweet_data + '\n\n转发 #' + rt_user + '#\n\n' + rt_tweet_text
+        tweet_data = message_format + original_tweet_data + '\n\n转发 🍁' + rt_user + '🍁\n\n' + rt_tweet_text
+        translate_tweet_data = translate(original_tweet_data.replace('\n','🍄').replace('「','🍺').replace('」','🍉'))
+        translate_rt_text = translate(rt_tweet_text.replace('\n','🍄').replace('「','🍺').replace('」','🍉'))
+        translate_data = '由 🍧百度翻译🍧 提供的翻译：\n\n' + translate_tweet_data + '\n\n转发 🍁' + rt_user + '🍁\n\n' + translate_rt_text
     else:
         tweet_data = message_format + original_tweet_data
+        translate_tweet_data = translate(original_tweet_data.replace('\n','🍄').replace('🍺','「').replace('🍉','」'))
+        translate_data = '由 🍧百度翻译🍧 提供的翻译：\n\n' + translate_tweet_data
     #	tweet_data=tweet_data.encode('utf-8')
-    print(tweet_data)
+    print('\n\nFound new tweet!'+'\n'+tweet_data)
     #	urllib.request.urlopen('http://127.0.0.1:5700/send_group_msg?group_id='+ str(qq_group_id) + '&message='+ tweet_data)
     send_group_mirai(tweet_data, qq_group_id)
+    send_group_mirai(translate_data.replace('🍄','\n'), qq_group_id)
     return
 
 
@@ -117,7 +130,7 @@ def send_picture(qq_group_id, url):
     image_tobesent = '{"sessionKey":"' + session + '","group": ' + str(qq_group_id) + ''',"urls":["''' + url + '"]}'
     response5 = requests.post(url=addr + '/sendImageMessage', data=image_tobesent)
     r5t = response5.text
-    print(r5t)
+    print('[Console] [send_picture] Successfully sent image, ImageID: '+ r5t[2:-2])
     return
 
 
@@ -145,7 +158,7 @@ def readfile(txtname):
     else:
         fileread = open(txtname, "r")
         for i in fileread.readlines():
-            print('Processed: '+i)
+            print('[Console] [readfile] Processed: '+i)
             if i is not '':
                 last_id = int(i)
             fileread.close()
@@ -208,12 +221,12 @@ def send_tweet(new_tweets, actual_name, qq_group_id, tags, reply_user_name, last
         if tags == 0 or match_tag == 0:
             send_qqgroup_message(retweet_time, retweet_text, actual_name, qq_group_id, reply_user_name, reply_text,
                                  rt_tweet_text, rt_user, repeat)
-            print('Retweet successed!')
+            print('[Console] [send_tweet] Retweet successed!')
             mu = [m['media_url'] for m in media]
             for n in mu:
                 if media != '' and with_picture == 1:
                     send_picture(qq_group_id, n)
-                    print('Send image successed! Image URL: ' + n)
+                    print('[Console] [send_tweet] Send image successed! Image URL: ' + n)
     return last_id
 
 
@@ -236,12 +249,47 @@ def retweet(screen_name, actual_name, qq_group_id, match_tag, repeat, with_pictu
                              with_picture)
         writefile(txtname, last_id)
 
+def translate(orig_text):
+    orig_lang = 'auto'
+    target_lang = 'zh'
+    salt = random.randint(32768, 65536)
+
+    orig_sign = baidu_app_id + orig_text + str(salt) + baidu_id_key
+#    print(orig_sign) #debug
+    m = hashlib.new('md5')
+    m.update(orig_sign.encode(encoding="utf-8"))
+    msign = m.hexdigest() #得到原始签名的MD5值
+    data = {
+        "q": orig_text,   
+        "from": "auto",
+        "to": "zh",
+        "appid": baidu_app_id,
+        "salt": salt,
+        "sign": msign
+    }
+    url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
+
+    r = requests.get(url, params=data)
+    if r.status_code == 200:
+        try:
+            result = r.json()
+            translate_result = result["trans_result"][0]["dst"]
+            print('\nTranslate result: ' + '\n' + translate_result)
+        except:
+            translate_result = ''
+    else:
+        print('[Console] [translate] Translation Failed!')
+
+    return translate_result
+
+
 #main
+print('Stage1:Preparation'.center(50,'-')+'\n')
 get_session()
 
 #Enter your configs here
 # retweet('screen_name','twitter_user's_real_name',qq_group_id,['tag'] or 0(no tag recognization),0(repeat) or 1(not_repeat),0(with_picture) or 1(without_picture))
-
+print('\n'+'Stage2:Retweet'.center(50,'-')+'\n')
 # xapenny
 retweet('xapenny2015', 'xapenny', 884169045, 0, 0, 1)
 # iOS讨论
@@ -264,7 +312,17 @@ retweet('Apple','Apple',567435967,0,0,1)
 retweet('qwertyoruiopz','qwertyoruiop',567435967,0,0,1)
 retweet('tim_cook','Tim Cook',567435967,0,0,1)
 retweet('PanguTeam','PanguTeam',567435967,0,0,1)
+#Key社family
+retweet('iktd13_', 'Na-Ga', 884169045, 0, 0, 1)
+retweet('takeshitaaaa', '竹下智博', 884169045, 0, 0, 1)
+retweet('kay_comment', '魁', 884169045, 0, 0, 1)
+retweet('maeda_jun_lab', '麻枝准研究所', 884169045, 0, 0, 1)
+retweet('kamisama_Ch_AB', '神様になった日&Charlotte&AB!公式', 884169045, 0, 0, 1)
+retweet('jun_owakon', '麻枝 准', 884169045, 0, 0, 1)
+retweet('key_official', 'Key開発室', 884169045, 0, 0, 1)
+retweet('kiyo_mizutsuki', '水月陵', 884169045, 0, 0, 1)
 
+print('\n\n'+'Stage3:Cleanup'.center(50,'-')+'\n')
 release_session()
 
 exit(0)
