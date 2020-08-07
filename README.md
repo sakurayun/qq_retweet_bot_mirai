@@ -1,6 +1,6 @@
 # qq_retweet_bot_mirai
 ## 关于此fork
-由于CoolQ停止服务，此fork将项目修改以适配Mirai-api-Http。如需访问CoolQ版本，请[返回原Repo](https://github.com/xiofan2/qq_retweet_bot "xiofan2/qq_retweet_bot")
+由于CoolQ停止服务，此fork将项目修改以适配Mirai-api-Http，并添加翻译功能(需要ApiKey)，简化终端输出。如需访问CoolQ版本，请[返回原Repo](https://github.com/xiofan2/qq_retweet_bot "xiofan2/qq_retweet_bot")
 
 ## 配置
 1. 安装python3
